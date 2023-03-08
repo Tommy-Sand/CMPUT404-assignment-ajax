@@ -74,24 +74,38 @@ def flask_post_json():
 @app.route("/")
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
-    return open('./static/index.html', 'r').read()
+    index = open('./static/index.html', 'r')
+    content = index.read()
+    index.close()
+    return content
 
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    data = flask_post_json();
-    if(data['x'] == None or data['y'] == None):
-        return 400
-    if(data['x'] < 0 or data['y'] < 0):
-        return 400
-    myWorld.set(entity, data)
-    return flask_post_json()
-
+    if(request.method == 'PUT'):
+        data = flask_post_json()
+        if(data['x'] == None or data['y'] == None):
+            return 400
+        if(data['x'] < 0 or data['y'] < 0):
+            return 400
+        myWorld.set(entity, data)
+        return myWorld.get(entity)
+    elif(request.method == 'POST'):
+        data = flask_post_json()
+        for key in data.keys():
+            myWorld.update(entity, key, data[key])
+        return myWorld.get(entity)
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
     if(request.method == 'GET'):
         return myWorld.world();
+    elif(request.method == 'POST'):
+        json = flask_post_json()
+        if(flask_post_json() != None):
+            for key in json.keys():
+                myWorld.set(key, json[key])
+        return myWorld.world()
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
