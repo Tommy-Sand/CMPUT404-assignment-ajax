@@ -71,7 +71,7 @@ function drawCircle(context,entity) {
         //moveTo(x,y);
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
+        arc(x, y, (entity["radius"])?entity["radius"]:10, 0, 2.0 * Math.PI, false);  
         stroke();                                
 		fill();
     }
@@ -298,14 +298,17 @@ function update() {
 
 	xhr2.onreadystatechange = function () {
 		if(xhr2.readyState == 4 && xhr2.repsonse != "" && xhr2.response != undefined){
-			world = JSON.parse(xhr2.response);
+			const json = JSON.parse(xhr2.response);
+			if(world != JSON.parse(xhr2.response)){
+				world = json;
+				drawNextFrame();
+			}
 		}
 	}
 	
-	xhr2.send()
+	xhr2.send();
 	
 	drawFrame();
-	drawNextFrame();
 }
 
 
